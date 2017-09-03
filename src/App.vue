@@ -3,6 +3,7 @@
     <header>
       <img src="./assets/logo.png" alt="Bitcoin" width="36">
       <span>Cryptocurrency Price</span>
+      <div class="refresh">Refreshing in {{ remainingSeconds }}</div>
     </header>
     <main>
       <div class="currencies">
@@ -19,15 +20,17 @@
 </template>
 
 <script>
+import { mapState, mapActions } from 'vuex'
 import Currency from './components/Currency'
-import axios from 'axios'
 
 export default {
   name: 'app',
 
   data () {
     return {
-      currencies: []
+      remainingSeconds: 0,
+      refreshInterval: 60,
+      countdown: null
     }
   },
 
@@ -35,24 +38,32 @@ export default {
     Currency
   },
 
+  computed: mapState({
+    currencies: state => state.currencies,
+    pending: state => state.pending,
+    error: state => state.error
+  }),
+
   created () {
-    this.getPrice()
+    this.listCurrencies()
 
     setInterval(() => {
-      this.getPrice()
-    }, 6000)
+      this.listCurrencies()
+    }, this.refreshInterval * 1000)
+
+    setInterval(() => {
+      if (this.remainingSeconds === 0) {
+        this.remainingSeconds = this.refreshInterval
+      } else {
+        this.remainingSeconds--
+      }
+    }, 1000)
   },
 
   methods: {
-    getPrice () {
-      const url = 'https://api.coinmarketcap.com/v1/ticker/?convert=EUR&limit=40'
-
-      axios
-        .get(url)
-        .then(response => {
-          this.currencies = response.data
-        })
-    }
+    ...mapActions([
+      'listCurrencies'
+    ])
   }
 }
 </script>
@@ -93,6 +104,11 @@ header span {
   font-weight: 400;
   box-sizing: border-box;
   margin-left: 20px;
+}
+
+header .refresh {
+  flex: 1;
+  text-align: right;
 }
 
 .currencies {
