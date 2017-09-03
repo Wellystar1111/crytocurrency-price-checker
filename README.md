@@ -1,4 +1,4 @@
-# bitcoin
+# crytocurrency-price-checker
 
 > A Vue.js project
 
