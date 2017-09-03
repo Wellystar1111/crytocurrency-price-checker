@@ -10,12 +10,13 @@ import Vapi from 'vuex-rest-api'
 
 Vue.use(Vuex)
 
-const currencies = new Vapi({
+let currencies = new Vapi({
   baseURL: 'https://api.coinmarketcap.com/v1/ticker',
 
   state: {
-    remainingSeconds: 60,
-    currencies: []
+    refreshInterval: 60,
+    currencies: [],
+    currency: null
   }})
 
   .get({
@@ -32,6 +33,20 @@ const currencies = new Vapi({
   })
   .getStore()
 
+currencies.state.remainingSeconds = 60
+
+currencies.mutations.decrement = state => {
+  if (state.remainingSeconds === 0) {
+    state.remainingSeconds = state.refreshInterval
+  } else {
+    state.remainingSeconds--
+  }
+}
+
+currencies.actions.decrement = context => {
+  context.commit('decrement')
+}
+
 const store = new Vuex.Store(currencies)
 
 // Router
@@ -42,8 +57,8 @@ import CurrencyDetail from './CurrencyDetail'
 Vue.use(VueRouter)
 
 const routes = [
-  { path: '/', component: CurrencyList },
-  { path: '/:currencyName', component: CurrencyDetail }
+  { path: '/', component: CurrencyList, name: 'CurrencyList' },
+  { path: '/:name', component: CurrencyDetail, name: 'CurrencyDetail', props: true }
 ]
 
 const router = new VueRouter({

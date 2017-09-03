@@ -1,12 +1,15 @@
 <template>
   <div class="currency-list">
-    <currency
+    <router-link
       class="currency"
       v-for="currency in currencies"
       :key="currency.name"
-      :name="currency.name"
-      :price="currency.price_eur"
-    ></currency>
+      :to="{ name: 'CurrencyDetail', params: { name: currency.name } }">
+      <currency
+        :name="currency.name"
+        :price="currency.price_eur"
+      ></currency>
+    </router-link>
   </div>
 </template>
 
@@ -17,20 +20,14 @@ import Currency from './components/Currency'
 export default {
   name: 'currency-list',
 
-  data () {
-    return {
-      remainingSeconds: 0,
-      refreshInterval: 60,
-      countdown: null
-    }
-  },
-
   components: {
     Currency
   },
 
   computed: mapState({
     currencies: state => state.currencies,
+    remainingSeconds: state => state.remainingSeconds,
+    refreshInterval: state => state.refreshInterval,
     pending: state => state.pending,
     error: state => state.error
   }),
@@ -41,14 +38,6 @@ export default {
     setInterval(() => {
       this.listCurrencies()
     }, this.refreshInterval * 1000)
-
-    setInterval(() => {
-      if (this.remainingSeconds === 0) {
-        this.remainingSeconds = this.refreshInterval
-      } else {
-        this.remainingSeconds--
-      }
-    }, 1000)
   },
 
   methods: {
@@ -59,7 +48,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .currency-list {
   display: flex;
   flex-wrap: wrap;

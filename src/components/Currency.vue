@@ -1,5 +1,5 @@
 <template>
-  <div class="currency">
+  <div class="base">
     <h1>{{ normalizedPrice }}</h1>
     <h2>{{ name }}</h2>
   </div>

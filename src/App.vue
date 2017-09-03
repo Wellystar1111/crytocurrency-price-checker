@@ -2,7 +2,7 @@
   <div id="app">
     <header>
       <img src="./assets/logo.png" alt="Bitcoin" width="36">
-      <span>Cryptocurrency Price</span>
+      <span><router-link to="/">Cryptocurrency Price</router-link></span>
       <div class="refresh">Refreshing in {{ remainingSeconds }}</div>
     </header>
     <main>
@@ -12,14 +12,26 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 
 export default {
   name: 'app',
 
   computed: mapState({
     remainingSeconds: state => state.remainingSeconds
-  })
+  }),
+
+  created () {
+    setInterval(() => {
+      this.decrement()
+    }, 1000)
+  },
+
+  methods: {
+    ...mapActions([
+      'decrement'
+    ])
+  }
 }
 </script>
 
@@ -64,5 +76,10 @@ header span {
 header .refresh {
   flex: 1;
   text-align: right;
+}
+
+a {
+  color: currentColor;
+  text-decoration: none;
 }
 </style>
